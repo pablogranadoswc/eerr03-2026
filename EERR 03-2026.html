@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EERR Febrero–Marzo 2026 · WareCloud</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --bg2: #f7f7f5; --bg3: #f0efeb;
+    --text: #1a1a18; --text2: #6b6b65; --text3: #a0a09a;
+    --border: rgba(0,0,0,0.1); --border2: rgba(0,0,0,0.18);
+    --green: #1D9E75; --red: #E24B4A; --blue: #378ADD; --amber: #EF9F27;
+    --radius: 10px; --radius-sm: 6px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a18; --bg2: #242420; --bg3: #2e2e2a;
+      --text: #f0efeb; --text2: #a0a09a; --text3: #6b6b65;
+      --border: rgba(255,255,255,0.09); --border2: rgba(255,255,255,0.18);
+    }
+  }
+  body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; }
+  .dash { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+  .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+  .header-left h1 { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); margin-bottom: 4px; }
+  .header-left h2 { font-size: 24px; font-weight: 500; color: var(--text); }
+  .nav { display: flex; gap: 6px; flex-wrap: wrap; }
+  .nav button { font-size: 12px; font-weight: 500; padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; transition: all 0.15s; }
+  .nav button:hover { background: var(--bg2); }
+  .nav button.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 2rem; }
+  @media (max-width: 600px) { .kpis { grid-template-columns: 1fr 1fr; } }
+  .kpi { background: var(--bg2); border-radius: var(--radius-sm); padding: 1rem 1.1rem; }
+  .kpi-label { font-size: 10px; color: var(--text3); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 5px; }
+  .kpi-val { font-size: 20px; font-weight: 500; color: var(--text); }
+  .kpi-delta { font-size: 11px; margin-top: 3px; font-weight: 500; }
+  .pos { color: var(--green); } .neg { color: var(--red); }
+  .section-title { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 1rem; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  @media (max-width: 700px) { .grid2, .liquidity-grid { grid-template-columns: 1fr; } }
+  .card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem; }
+  .card:last-child { margin-bottom: 0; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .compare-table th { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); font-weight: 500; padding: 0 0 10px; text-align: right; }
+  .compare-table th:first-child { text-align: left; }
+  .compare-table td { padding: 7px 0; border-top: 1px solid var(--border); color: var(--text); text-align: right; }
+  .compare-table td:first-child { text-align: left; color: var(--text2); }
+  .compare-table tr.total td { font-weight: 500; border-top: 2px solid var(--border2); }
+  .compare-table tr.group td { font-weight: 500; background: var(--bg2); color: var(--text); }
+  .compare-table tr.group td:first-child { padding-left: 8px; }
+  .compare-table td.sub { padding-left: 16px; color: var(--text3); font-size: 12px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .bar-label { font-size: 12px; color: var(--text2); width: 150px; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 5px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; }
+  .bar-val { font-size: 11px; color: var(--text3); min-width: 90px; text-align: right; }
+  .liquidity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .liq-item, .deuda-item, .cobrar-item { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .liq-item:last-child, .deuda-item:last-child, .cobrar-item:last-child { border-bottom: none; }
+  .liq-name { color: var(--text2); } .liq-val { font-weight: 500; }
+  .deuda-item .monto { color: var(--red); font-weight: 500; }
+  .cobrar-item .monto { color: var(--green); font-weight: 500; }
+  .chart-wrap { position: relative; width: 100%; height: 220px; }
+  .note { font-size: 11px; color: var(--text3); margin-top: 8px; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 10px; font-size: 12px; color: var(--text2); }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .legend-sq { width: 10px; height: 10px; border-radius: 2px; }
+</style>
+</head>
+<body>
+<div class="dash">
+  <div class="header">
+    <div class="header-left">
+      <h1>WareCloud · Q1 2026</h1>
+      <h2>Estado de Resultados</h2>
+    </div>
+    <div class="nav">
+      <button class="active" onclick="showTab('resumen',this)">Resumen</button>
+      <button onclick="showTab('ventas',this)">Ventas</button>
+      <button onclick="showTab('costos',this)">Costos</button>
+      <button onclick="showTab('comida',this)">Almuerzos</button>
+      <button onclick="showTab('liquidez',this)">Liquidez</button>
+    </div>
+  </div>
+
+  <!-- RESUMEN -->
+  <div id="tab-resumen" class="tab-content active">
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-label">Ventas Feb</div><div class="kpi-val">$39,0M</div></div>
+      <div class="kpi"><div class="kpi-label">Ventas Mar</div><div class="kpi-val">$40,1M</div><div class="kpi-delta pos">▲ +$1,1M (+2,9%)</div></div>
+      <div class="kpi"><div class="kpi-label">Contrib. Feb</div><div class="kpi-val">$5,9M</div></div>
+      <div class="kpi"><div class="kpi-label">Contrib. Mar</div><div class="kpi-val">$7,2M</div><div class="kpi-delta pos">▲ +$1,2M (+20,7%)</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="section-title">Ventas vs Costos</div>
+        <div class="legend">
+          <span><span class="legend-sq" style="background:#378ADD"></span>Febrero</span>
+          <span><span class="legend-sq" style="background:#1D9E75"></span>Marzo</span>
+        </div>
+        <div class="chart-wrap"><canvas id="c1" role="img" aria-label="Ventas, costos y contribución marginal Febrero y Marzo 2026">Ventas Feb $39M Mar $40.1M. Costos Feb $33.1M Mar $33M. Contrib Feb $5.9M Mar $7.2M.</canvas></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Contribución marginal por área</div>
+        <div style="margin-top:10px;">
+          <div class="bar-row">
+            <div class="bar-label">Coworking</div>
+            <div class="bar-track"><div class="bar-fill" style="width:55%;background:var(--green)"></div></div>
+            <div class="bar-val">Feb $1,4M → <strong style="color:var(--green)">Mar $2,1M</strong></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">Serv. Gestión</div>
+            <div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--blue)"></div></div>
+            <div class="bar-val">Feb $2,3M → <strong style="color:var(--blue)">Mar $2,4M</strong></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">Otros Ingresos</div>
+            <div class="bar-track"><div class="bar-fill" style="width:75%;background:var(--blue)"></div></div>
+            <div class="bar-val">Feb $2,2M → <strong style="color:var(--blue)">Mar $2,7M</strong></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">Almuerzos/Des.</div>
+            <div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--red)"></div></div>
+            <div class="bar-val" style="color:var(--red)">Feb -$1,1M → Mar -$0,7M</div>
+          </div>
+        </div>
+        <div class="note" style="margin-top:14px;">Almuerzos sigue negativo pero mejora $336K en Marzo</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Síntesis ejecutiva</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:8px;">
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px;">Ventas</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7;">Crecimiento del 2,9% mensual impulsado por Almuerzos (+$205K) y Otros Ingresos (+$419K). HotDesk Interno con corrección del 2% aplicada.</div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px;">Costos</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7;">Reducción de $115K vs Febrero. Almuerzos baja $131K. Coworking prácticamente estable. Costos bien controlados.</div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px;">Resultado</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7;">Contribución marginal sube 20,7% de Febrero a Marzo. El margen sobre ventas pasa de 15,2% a 17,8%. Tendencia positiva en Q1.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENTAS -->
+  <div id="tab-ventas" class="tab-content">
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-label">Coworking Feb</div><div class="kpi-val">$22,0M</div></div>
+      <div class="kpi"><div class="kpi-label">Coworking Mar</div><div class="kpi-val">$22,7M</div><div class="kpi-delta pos">▲ +$693K</div></div>
+      <div class="kpi"><div class="kpi-label">Serv. Gestión</div><div class="kpi-val">$11,1M</div><div class="kpi-delta" style="color:var(--text3)">= Sin variación</div></div>
+      <div class="kpi"><div class="kpi-label">Otros Ingresos</div><div class="kpi-val">+$419K</div><div class="kpi-delta pos">▲ Feb $5,9M → Mar $6,3M</div></div>
+    </div>
+    <div class="card">
+      <div class="section-title">Detalle de Ventas — Febrero vs Marzo</div>
+      <table class="compare-table" style="margin-top:8px;">
+        <thead><tr><th style="width:52%">Concepto</th><th>Febrero</th><th>Marzo</th><th>Variación</th></tr></thead>
+        <tbody>
+          <tr class="group"><td>Coworking</td><td>$22.007.342</td><td>$22.700.844</td><td class="pos">+$693.502</td></tr>
+          <tr><td class="sub">HotDesk Interno</td><td>$14.285.842</td><td>$14.773.944</td><td class="pos">+$488.102</td></tr>
+          <tr><td class="sub">HotDesk Externo</td><td>$3.715.200</td><td>$3.715.200</td><td style="color:var(--text3)">—</td></tr>
+          <tr><td class="sub">Almuerzos y Desayunos</td><td>$4.006.300</td><td>$4.211.700</td><td class="pos">+$205.400</td></tr>
+          <tr class="group"><td>Servicios de Gestión</td><td>$11.086.250</td><td>$11.086.250</td><td style="color:var(--text3)">—</td></tr>
+          <tr><td class="sub">Capital Humano</td><td>$8.948.400</td><td>$8.948.400</td><td style="color:var(--text3)">—</td></tr>
+          <tr><td class="sub">Sostenibilidad</td><td>$1.351.250</td><td>$1.351.250</td><td style="color:var(--text3)">—</td></tr>
+          <tr><td class="sub">Monotributos</td><td>$786.600</td><td>$786.600</td><td style="color:var(--text3)">—</td></tr>
+          <tr class="group"><td>Otros Ingresos</td><td>$5.911.080</td><td>$6.330.696</td><td class="pos">+$419.616</td></tr>
+          <tr><td class="sub">Alquiler</td><td>$3.674.000</td><td>$3.674.000</td><td style="color:var(--text3)">—</td></tr>
+          <tr><td class="sub">Otros Ingresos</td><td>$2.237.080</td><td>$2.656.696</td><td class="pos">+$419.616</td></tr>
+          <tr class="total"><td>Total Ventas</td><td>$39.004.672</td><td>$40.117.790</td><td class="pos">+$1.113.118</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- COSTOS -->
+  <div id="tab-costos" class="tab-content">
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-label">Costos Feb</div><div class="kpi-val">$33,1M</div></div>
+      <div class="kpi"><div class="kpi-label">Costos Mar</div><div class="kpi-val">$33,0M</div><div class="kpi-delta pos">▼ -$115K (-0,35%)</div></div>
+      <div class="kpi"><div class="kpi-label">Margen Feb</div><div class="kpi-val">15,2%</div></div>
+      <div class="kpi"><div class="kpi-label">Margen Mar</div><div class="kpi-val">17,8%</div><div class="kpi-delta pos">▲ +2,6 pp</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="section-title">Detalle de Costos</div>
+        <table class="compare-table" style="margin-top:8px;">
+          <thead><tr><th style="width:50%">Concepto</th><th>Febrero</th><th>Marzo</th></tr></thead>
+          <tbody>
+            <tr class="group"><td>Costos Coworking</td><td>$20.638.921</td><td>$20.591.189</td></tr>
+            <tr><td class="sub">HotDesk</td><td>$15.566.619</td><td>$15.650.251</td></tr>
+            <tr><td class="sub">Almuerzos y Des.</td><td>$5.072.302</td><td>$4.940.938</td></tr>
+            <tr class="group"><td>Serv. de Gestión</td><td>$8.764.574</td><td>$8.696.869</td></tr>
+            <tr><td class="sub">Sueldos Cap. Humano</td><td>$6.758.654</td><td>$6.799.941</td></tr>
+            <tr><td class="sub">Sueldos Sostenib.</td><td>$1.191.116</td><td>$1.039.657</td></tr>
+            <tr><td class="sub">Monotributos</td><td>$811.189</td><td>$853.632</td></tr>
+            <tr><td class="sub">Servidores</td><td>$3.616</td><td>$3.638</td></tr>
+            <tr class="group"><td>Costos Otros Ingr.</td><td>$3.674.000</td><td>$3.674.000</td></tr>
+            <tr class="total"><td>Total Costos</td><td>$33.077.495</td><td>$32.962.058</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="section-title">Contribución marginal</div>
+        <table class="compare-table" style="margin-top:8px;">
+          <thead><tr><th style="width:50%">Área</th><th>Febrero</th><th>Marzo</th></tr></thead>
+          <tbody>
+            <tr><td>Cmg Coworking</td><td>$1.368.421</td><td class="pos">$2.109.655</td></tr>
+            <tr><td class="sub">HotDesk</td><td>$2.434.423</td><td class="pos">$2.838.893</td></tr>
+            <tr><td class="sub">Almuerzos/Des.</td><td class="neg">-$1.066.002</td><td class="neg">-$729.238</td></tr>
+            <tr><td>Cmg Serv. Gestión</td><td>$2.321.676</td><td class="pos">$2.389.381</td></tr>
+            <tr><td class="sub">Capital Humano</td><td>$2.186.130</td><td>$2.144.820</td></tr>
+            <tr><td class="sub">Sostenibilidad</td><td>$160.134</td><td class="pos">$311.593</td></tr>
+            <tr><td class="sub">Monotributos</td><td class="neg">-$24.589</td><td class="neg">-$67.032</td></tr>
+            <tr><td>Cmg Otros Ingresos</td><td>$2.237.080</td><td class="pos">$2.656.696</td></tr>
+            <tr class="total"><td>Total Contrib. Marg.</td><td>$5.927.177</td><td class="pos">$7.155.732</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALMUERZOS -->
+  <div id="tab-comida" class="tab-content">
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-label">Menús Feb</div><div class="kpi-val">667</div><div class="kpi-delta" style="color:var(--text3)">+4 desayunos</div></div>
+      <div class="kpi"><div class="kpi-label">Menús Mar</div><div class="kpi-val">698</div><div class="kpi-delta" style="color:var(--text3)">+43 desayunos</div></div>
+      <div class="kpi"><div class="kpi-label">Resultado Feb</div><div class="kpi-val neg">-$1.066.002</div></div>
+      <div class="kpi"><div class="kpi-label">Resultado Mar</div><div class="kpi-val neg">-$729.238</div><div class="kpi-delta pos">▲ Mejora $336K</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="section-title">Febrero 22/01 — 21/02/2026</div>
+        <div style="margin-top:10px;">
+          <div class="liq-item"><span class="liq-name">Ingresos</span><span class="liq-val">$4.006.300</span></div>
+          <div class="liq-item"><span class="liq-name">Precio menú (internos)</span><span class="liq-val">$5.500</span></div>
+          <div class="liq-item"><span class="liq-name">Carnicería</span><span class="liq-val">$1.429.850</span></div>
+          <div class="liq-item"><span class="liq-name">La Esperanza</span><span class="liq-val">$1.056.342</span></div>
+          <div class="liq-item"><span class="liq-name">Verdurapp</span><span class="liq-val">$517.254</span></div>
+          <div class="liq-item"><span class="liq-name">Sueldo Stella</span><span class="liq-val">$2.068.856</span></div>
+          <div class="liq-item"><span class="liq-name">Gastos Totales</span><span class="liq-val">$5.072.302</span></div>
+          <div class="liq-item"><span class="liq-name">Costo por menú</span><span class="liq-val">$7.605</span></div>
+          <div class="liq-item"><span class="liq-name">Precio − Costo</span><span class="liq-val neg">−$2.105</span></div>
+          <div style="border-top:2px solid var(--border2);margin-top:8px;padding-top:10px;display:flex;justify-content:space-between;">
+            <span style="font-weight:500">Resultado</span><span style="color:var(--red);font-weight:500">−$1.066.002</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">Marzo 22/02 — 21/03/2026</div>
+        <div style="margin-top:10px;">
+          <div class="liq-item"><span class="liq-name">Ingresos</span><span class="liq-val">$4.211.700</span></div>
+          <div class="liq-item"><span class="liq-name">Precio menú (internos)</span><span class="liq-val">$5.500</span></div>
+          <div class="liq-item"><span class="liq-name">Carnicería</span><span class="liq-val">$1.036.544</span></div>
+          <div class="liq-item"><span class="liq-name">La Esperanza</span><span class="liq-val">$1.170.701</span></div>
+          <div class="liq-item"><span class="liq-name">Verdurapp</span><span class="liq-val">$752.259</span></div>
+          <div class="liq-item"><span class="liq-name">Sueldo Stella</span><span class="liq-val">$1.981.434</span></div>
+          <div class="liq-item"><span class="liq-name">Gastos Totales</span><span class="liq-val">$4.940.938</span></div>
+          <div class="liq-item"><span class="liq-name">Costo por menú</span><span class="liq-val">$7.079</span></div>
+          <div class="liq-item"><span class="liq-name">Precio − Costo</span><span class="liq-val neg">−$1.579</span></div>
+          <div style="border-top:2px solid var(--border2);margin-top:8px;padding-top:10px;display:flex;justify-content:space-between;">
+            <span style="font-weight:500">Resultado</span><span style="color:var(--red);font-weight:500">−$729.238</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Tendencia histórica — Resultado mensual</div>
+      <div class="legend" style="margin-top:8px;">
+        <span><span class="legend-sq" style="background:#378ADD;opacity:0.6"></span>2024</span>
+        <span><span class="legend-sq" style="background:#E24B4A"></span>2025</span>
+        <span><span class="legend-sq" style="background:#EF9F27"></span>2026</span>
+      </div>
+      <div class="chart-wrap" style="height:200px;"><canvas id="c3" role="img" aria-label="Tendencia resultados almuerzos 2024-2026">Resultados 2026: Enero -$2.6M, Febrero -$1.1M, Marzo -$0.7M.</canvas></div>
+      <div class="note">Abril 2026: 828 menús · $5.842.700 (costos pendientes de cargar)</div>
+    </div>
+  </div>
+
+  <!-- LIQUIDEZ -->
+  <div id="tab-liquidez" class="tab-content">
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-label">Disponible $</div><div class="kpi-val">$12,7M</div><div class="kpi-delta" style="color:var(--text3)">al 17/04</div></div>
+      <div class="kpi"><div class="kpi-label">Disponible USD</div><div class="kpi-val">USD 6.300</div></div>
+      <div class="kpi"><div class="kpi-label">Por Ingresar</div><div class="kpi-val pos">$5,0M</div><div class="kpi-delta pos">+ USD 4.322</div></div>
+      <div class="kpi"><div class="kpi-label">Deudas</div><div class="kpi-val neg">−$2,3M</div><div class="kpi-delta neg">Proveedores</div></div>
+    </div>
+    <div class="liquidity-grid">
+      <div class="card">
+        <div class="section-title">Cajas al 17/04</div>
+        <div style="margin-top:10px;">
+          <div class="liq-item"><span class="liq-name">Galicia</span><span class="liq-val">$1.137.638</span></div>
+          <div class="liq-item"><span class="liq-name">Fondo</span><span class="liq-val">$8.123.504</span></div>
+          <div class="liq-item"><span class="liq-name">Efectivo</span><span class="liq-val">$5.748.300</span></div>
+          <div class="liq-item"><span class="liq-name">USD</span><span class="liq-val">u$d 6.300</span></div>
+          <div class="liq-item"><span class="liq-name">Cheques</span><span class="liq-val">$0</span></div>
+          <div style="border-top:2px solid var(--border2);margin-top:8px;padding-top:10px;display:flex;justify-content:space-between;">
+            <span style="font-weight:500;font-size:13px;">Total $</span><span style="font-weight:500;font-size:14px;">$15.009.442</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;">
+            <span style="font-weight:500;font-size:13px;">Total USD</span><span style="font-weight:500;font-size:14px;">u$d 6.300</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">Por cobrar</div>
+        <div style="margin-top:10px;">
+          <div class="cobrar-item"><span>Bauhoff</span><span class="monto">$700.000</span></div>
+          <div class="cobrar-item"><span>Smod</span><span class="monto">$2.650.000</span></div>
+          <div class="cobrar-item"><span>La Bodeguita</span><span class="monto">$1.000.000</span></div>
+          <div class="cobrar-item"><span>Nativas</span><span class="monto">$650.000</span></div>
+          <div class="cobrar-item"><span>Nimble</span><span style="color:var(--green);font-weight:500">u$d 4.322</span></div>
+        </div>
+        <div class="section-title" style="margin-top:1.2rem;margin-bottom:8px;">Deudas proveedores</div>
+        <div class="deuda-item"><span>Cook Express SRL</span><span class="monto">−$339.650</span></div>
+        <div class="deuda-item"><span>Juanchi — Carnicería</span><span class="monto">−$1.099.641</span></div>
+        <div class="deuda-item"><span>La Esperanza</span><span class="monto">−$894.854</span></div>
+        <div style="border-top:2px solid var(--border2);margin-top:8px;padding-top:10px;display:flex;justify-content:space-between;">
+          <span style="font-weight:500;font-size:13px;">Total deuda</span><span style="font-weight:500;font-size:14px;color:var(--red)">−$2.334.145</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Compensaciones Ecloud — USD (Positivo cobro / Negativo pagos)</div>
+      <div class="legend" style="margin-top:8px;">
+        <span><span class="legend-sq" style="background:#B5D4F4"></span>Enero 26</span>
+        <span><span class="legend-sq" style="background:#E24B4A"></span>Febrero 26</span>
+        <span><span class="legend-sq" style="background:#EF9F27"></span>Marzo 26</span>
+      </div>
+      <div class="chart-wrap" style="height:180px;"><canvas id="c4" role="img" aria-label="Compensaciones en USD enero-marzo 2026">Enero USD 1.297, Febrero USD 789, Marzo USD 1.122.</canvas></div>
+      <div class="note" style="margin-top:8px;">SMOD nos debe: dic-25 u$d 8.000 · ene-26 u$d 8.928 · feb-26 u$d 8.028 · mar-26 u$d 8.028</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  renderCharts();
+}
+
+const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+const textColor = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)';
+const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+const fmt = v => '$' + (v/1000000).toFixed(1) + 'M';
+let done = false;
+
+function renderCharts() {
+  if (done) return; done = true;
+  new Chart(document.getElementById('c1'), {
+    type:'bar',
+    data:{ labels:['Ventas','Costos','Contrib. Marg.'], datasets:[
+      {label:'Febrero',data:[39004672,33077495,5927177],backgroundColor:'#378ADD',borderRadius:4},
+      {label:'Marzo',data:[40117790,32962058,7155732],backgroundColor:'#1D9E75',borderRadius:4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.raw)}}},scales:{x:{ticks:{color:textColor,font:{size:11}},grid:{color:gridColor}},y:{ticks:{color:textColor,font:{size:10},callback:fmt},grid:{color:gridColor}}}}
+  });
+  new Chart(document.getElementById('c3'), {
+    type:'line',
+    data:{ labels:['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'], datasets:[
+      {label:'2024',data:[null,-211775,-285195,156244,-328689,-729238,null,null,null,null,null,null],borderColor:'#378ADD',backgroundColor:'transparent',tension:0.3,pointRadius:3,borderDash:[4,4]},
+      {label:'2025',data:[null,-1065502,568512,434215,628267,405565,-26391,-37055,108315,53121,299967,439977],borderColor:'#E24B4A',backgroundColor:'transparent',tension:0.3,pointRadius:3},
+      {label:'2026',data:[-2604863,-1066002,-729238,null,null,null,null,null,null,null,null,null],borderColor:'#EF9F27',backgroundColor:'transparent',tension:0.3,pointRadius:4,borderWidth:2}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': $'+(c.raw||0).toLocaleString('es-AR')}}},scales:{x:{ticks:{color:textColor,font:{size:10},autoSkip:false},grid:{color:gridColor}},y:{ticks:{color:textColor,font:{size:10},callback:v=>'$'+(v/1000000).toFixed(1)+'M'},grid:{color:gridColor}}}}
+  });
+  new Chart(document.getElementById('c4'), {
+    type:'bar',
+    data:{ labels:['Enero 26','Febrero 26','Marzo 26'], datasets:[{label:'USD',data:[1297,789,1122],backgroundColor:['#B5D4F4','#E24B4A','#EF9F27'],borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'USD '+c.raw}}},scales:{x:{ticks:{color:textColor,font:{size:11}},grid:{color:gridColor}},y:{ticks:{color:textColor,font:{size:10},callback:v=>'USD '+v},grid:{color:gridColor}}}}
+  });
+}
+renderCharts();
+</script>
+</body>
+</html>
